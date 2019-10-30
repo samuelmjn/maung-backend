@@ -1,1 +1,1 @@
-web: cd maung_backend && python manage.py runserver 0.0.0.0:9000
+web: cd maung_backend && python manage.py runserver 0.0.0.0:$PORT
