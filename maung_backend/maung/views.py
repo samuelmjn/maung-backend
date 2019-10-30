@@ -12,13 +12,18 @@ def find_all_members(request):
     if request.method == 'GET':
         limit = int(request.GET["limit"])
         page = int(request.GET["page"])
-        offset = (page - 1) * limit
-        if offset < 0:
-            offset = 0
-        members = Member.objects.all() [offset:offset+limit]
+        if limit and page:
+            offset = (page - 1) * limit
+            if offset < 0:
+                offset = 0
+            members = Member.objects.all() [offset:offset+limit]
+            if len(members) == 0:
+                    return JsonResponse(status=404)
         
-        serializer = MemberSerializer(members, many=True)
-        return JsonResponse(serializer.data, safe=False)
+            serializer = MemberSerializer(members, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return JsonResponse(status=500)
     else:
         return JsonResponse(status=400)
 
@@ -27,13 +32,18 @@ def search_members(request):
         keyword = request.GET["keyword"]
         limit = int(request.GET["limit"])
         page = int(request.GET["page"])
-        offset = (page - 1) * limit
-        if offset < 0:
-            offset = 0
-        if keyword:
-            members = Member.objects.filter(full_name__icontains=keyword) [offset:offset+limit]
+        if keyword and limit and page:
+            offset = (page - 1) * limit
+            if offset < 0:
+                offset = 0
+            if keyword:
+                members = Member.objects.filter(full_name__icontains=keyword) [offset:offset+limit]
+                if len(members) == 0:
+                    return JsonResponse(status=404)
 
-        serializer = MemberSerializer(members, many=True)
-        return JsonResponse(serializer.data, safe=False)
+            serializer = MemberSerializer(members, many=True)
+            return JsonResponse(serializer.data, safe=False)
+        else:
+            return JsonResponse(status=500)
     else:
         return JsonResponse(status=400)
