@@ -21,3 +21,19 @@ def find_all_members(request):
         return JsonResponse(serializer.data, safe=False)
     else:
         return JsonResponse(status=400)
+
+def search_members(request):
+    if request.method == 'GET':
+        keyword = request.GET["keyword"]
+        limit = int(request.GET["limit"])
+        page = int(request.GET["page"])
+        offset = (page - 1) * limit
+        if offset < 0:
+            offset = 0
+        if keyword:
+            members = Member.objects.filter(full_name__icontains=keyword) [offset:offset+limit]
+
+        serializer = MemberSerializer(members, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    else:
+        return JsonResponse(status=400)
